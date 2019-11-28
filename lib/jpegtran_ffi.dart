@@ -1,5 +1,5 @@
-import 'dart:ffi' show Pointer, Uint8, Uint32, IntPtr;
-import 'package:ffi/ffi.dart' show Utf8;
+import 'dart:ffi';
+import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:typed_data';
 import 'package:jpegtran_ffi/src/bindings.dart';
@@ -80,8 +80,8 @@ class JpegOptions {
 }
 
 Pointer<TJTransform> _allocateTransform(TJXOP op, JpegCrop crop, JpegOptions options, JpegTransformer transformer) {
-  final p = Pointer<TJTransform>.allocate();
-  final tf = p.load<TJTransform>();
+  final p = allocate<TJTransform>();
+  final tf = p.ref;
   tf.init();
   tf.op = op.index;
   if (crop != null) {
@@ -105,13 +105,7 @@ class JpegCrop implements JpegTransformation {
 
   final JpegOptions options;
 
-  JpegCrop(
-      {@required this.x,
-      @required this.y,
-      @required this.w,
-      @required this.h,
-      this.alignIfRequired = true,
-      this.options = const JpegOptions()});
+  JpegCrop({@required this.x, @required this.y, @required this.w, @required this.h, this.alignIfRequired = true, this.options = const JpegOptions()});
 
   @override
   Pointer<TJTransform> _getTransform(JpegTransformer transformer) {
@@ -247,18 +241,18 @@ class JpegTransformer {
   JpegTransformer(Uint8List jpegBytes) {
     _handle = _bindings.tjInitTransform();
 
-    _jpegBuf = Pointer<Uint8>.allocate(count: jpegBytes.length);
+    _jpegBuf = allocate<Uint8>(count: jpegBytes.length);
     _jpegSize = jpegBytes.length;
 
     // TODO: can this copying be avoided?
-    Uint8List jpegBufDart = _jpegBuf.asExternalTypedData(count: _jpegSize);
+    Uint8List jpegBufDart = _jpegBuf.asTypedList(_jpegSize);
     for (var i = 0; i < jpegBytes.length; i++) {
       jpegBufDart[i] = jpegBytes[i];
     }
   }
 
   void dispose() {
-    _jpegBuf.free();
+    free(_jpegBuf);
 
     int res = _bindings.tjDestroy(_handle);
     if (res != 0) {
@@ -274,25 +268,24 @@ class JpegTransformer {
   /// Basic information from the JPEG header
   JpegInfo getInfo() {
     // TODO: put into a single allocation
-    final pWidth = Pointer<Uint32>.allocate();
-    final pHeight = Pointer<Uint32>.allocate();
-    final pSubsamp = Pointer<Uint32>.allocate();
-    final pColorspace = Pointer<Uint32>.allocate();
+    final pWidth = allocate<Uint32>();
+    final pHeight = allocate<Uint32>();
+    final pSubsamp = allocate<Uint32>();
+    final pColorspace = allocate<Uint32>();
 
     // TODO: can try to do this in Dart for possibly better peformance
-    int res = _bindings.tjDecompressHeader3(
-        _handle, _jpegBuf, _jpegSize, pWidth, pHeight, pSubsamp, pColorspace);
+    int res = _bindings.tjDecompressHeader3(_handle, _jpegBuf, _jpegSize, pWidth, pHeight, pSubsamp, pColorspace);
 
     if (res != 0) {
       throw Exception("tjDecompressHeader3 failed: " + _getLastError());
     }
 
-    var info = JpegInfo(pWidth.load(), pHeight.load(), pSubsamp.load(), pColorspace.load());
+    var info = JpegInfo(pWidth.value, pHeight.value, pSubsamp.value, pColorspace.value);
 
-    pWidth.free();
-    pHeight.free();
-    pSubsamp.free();
-    pColorspace.free();
+    free(pWidth);
+    free(pHeight);
+    free(pSubsamp);
+    free(pColorspace);
 
     return info;
   }
@@ -300,25 +293,25 @@ class JpegTransformer {
   Uint8List transform(JpegTransformation transformation) {
     var tf = transformation._getTransform(this);
 
-    final pDstBufs = Pointer<Pointer<Uint8>>.allocate(count: 1);
-    final pDstSizes = Pointer<IntPtr>.allocate(count: 1);
+    final pDstBufs = allocate<Pointer<Uint8>>(count: 1);
+    final pDstSizes = allocate<IntPtr>(count: 1);
 
-    pDstBufs.store(Pointer<Uint8>.fromAddress(0));
+    pDstBufs.value = Pointer<Uint8>.fromAddress(0);
 
     int res = _bindings.tjTransform(_handle, _jpegBuf, _jpegSize, 1, pDstBufs, pDstSizes, tf, 0);
 
-    Pointer<Uint8> dstBuf = pDstBufs.load();
-    int resultSize = pDstSizes.load();
+    Pointer<Uint8> dstBuf = pDstBufs.value;
+    int resultSize = pDstSizes.value;
 
-    tf.free();
-    pDstBufs.free();
-    pDstSizes.free();
+    free(tf);
+    free(pDstBufs);
+    free(pDstSizes);
 
     if (res != 0) {
       throw Exception("JpegTransformer failed: " + _getLastError());
     }
 
-    Uint8List dstBufDart = dstBuf.asExternalTypedData(count: resultSize);
+    Uint8List dstBufDart = dstBuf.asTypedList(resultSize);
     Uint8List outBytes = Uint8List.fromList(dstBufDart);
     _bindings.tjFree(dstBuf);
 
