@@ -5,35 +5,30 @@ Mostly lossless transformations for JPEG images, implemented using libjpeg-turbo
 ## Example
 
 ```dart
-void _cropToSquare() {
+void _cropToSquareRotate() {
     var jpegtran = JpegTransformer(_imageBytes);
     try {
         var info = jpegtran.getInfo();
 
-        JpegCrop crop;
-        if (info.width > info.height) {
-            crop = JpegCrop(
-                x: (info.width - info.height) ~/ 2,
-                y: 0,
-                w: info.height,
-                h: info.height,
-                alignIfRequired: true);
-        }
-        if (info.height > info.width) {
-            crop = JpegCrop(
-                x: 0,
-                y: (info.height - info.width) ~/ 2,
-                w: info.width,
-                h: info.width,
-                alignIfRequired: true);
-        }
+        var cropSize = min(info.width, info.height);
+        var crop = JpegCrop(
+            w: cropSize,
+            h: cropSize,
+            x: (info.width - cropSize) ~/ 2,
+            y: (info.height - cropSize) ~/ 2,
+            alignIfRequired: true,
+        );
 
-        if (crop != null) {
-            var newImage = jpegtran.transform(crop);
-            setState(() {
-                _imageBytes = newImage;
-            });
-        }
+        var rotate = JpegRotation(
+            angle: 90,
+            crop: crop,
+            options: JpegOptions(grayscale: false),
+        );
+
+        var newImage = jpegtran.transform(rotate);
+        setState(() {
+            _imageBytes = newImage;
+        });
     } catch (err) {
         _showError(err, context);
     } finally {
