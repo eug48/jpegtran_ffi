@@ -45,4 +45,4 @@ void _cropToSquare() {
 
 ## TODO
 
-* iOS support
+* Remove unneeded parts of libjpeg-turbo

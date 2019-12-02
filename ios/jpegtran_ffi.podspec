@@ -13,6 +13,7 @@ A new flutter plugin project.
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
   s.source_files = ['Classes/**/*', 'libjpeg-turbo/**/*']
+  s.exclude_files = ['libjpeg-turbo/{jstdhuff,jdmrgext,jdmrg565,jccolext,jdcolext,jdcol565}.c']
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
 

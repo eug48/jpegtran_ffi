@@ -1,3 +1,7 @@
+## 0.0.4
+
+* iOS support - build fix
+
 ## 0.0.3
 
 * iOS support
