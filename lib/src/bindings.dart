@@ -172,9 +172,8 @@ class JpegTranBindings {
 
   JpegTranBindings() {
     final DynamicLibrary lib = (Platform.isAndroid || Platform.isLinux)
-        ? DynamicLibrary.open("libturbojpeg.so")
-        // TODO: support iOS
-        : throw Exception("jpegtran_ffi: ${Platform.operatingSystem} not yet supported");
+        ? DynamicLibrary.open("libturbojpeg.so") // android or linux
+        : DynamicLibrary.process(); // ios
 
     tjInitTransform =
         lib.lookupFunction<tjInitTransform_C, tjInitTransform_Dart>("tjInitTransform");
