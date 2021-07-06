@@ -5,9 +5,10 @@ homepage: https://www.github.com/eug48/jpegtran_ffi
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
+  flutter: ">=1.12.0"
 
 dependencies:
-  ffi: 1.1.2
+  ffi: ^1.1.2
   flutter:
     sdk: flutter
 
@@ -23,5 +24,9 @@ flutter:
   # be modified. They are used by the tooling to maintain consistency when
   # adding or updating assets for this project.
   plugin:
-    androidPackage: com.example.jpegtran_ffi
-    pluginClass: JpegtranFfiPlugin
+    platforms:
+      android:
+        package: com.example.jpegtran_ffi
+        pluginClass: JpegtranFfiPlugin
+      ios:
+        pluginClass: JpegtranFfiPlugin

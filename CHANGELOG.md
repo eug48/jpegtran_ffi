@@ -1,3 +1,8 @@
+## 0.0.5
+
+* Upgraded to ffi ^1.1.2
+
+
 ## 0.0.4
 
 * iOS support - build fix
