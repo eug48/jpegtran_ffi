@@ -80,7 +80,7 @@ class JpegOptions {
 }
 
 Pointer<TJTransform> _allocateTransform(TJXOP op, JpegCrop crop, JpegOptions options, JpegTransformer transformer) {
-  final p = allocate<TJTransform>();
+  final p = calloc<TJTransform>();
   final tf = p.ref;
   tf.init();
   tf.op = op.index;
@@ -241,7 +241,7 @@ class JpegTransformer {
   JpegTransformer(Uint8List jpegBytes) {
     _handle = _bindings.tjInitTransform();
 
-    _jpegBuf = allocate<Uint8>(count: jpegBytes.length);
+    _jpegBuf = calloc<Uint8>(jpegBytes.length);
     _jpegSize = jpegBytes.length;
 
     // TODO: can this copying be avoided?
@@ -252,7 +252,7 @@ class JpegTransformer {
   }
 
   void dispose() {
-    free(_jpegBuf);
+    calloc.free(_jpegBuf);
 
     int res = _bindings.tjDestroy(_handle);
     if (res != 0) {
@@ -262,16 +262,16 @@ class JpegTransformer {
 
   String _getLastError() {
     var buf = _bindings.tjGetErrorStr();
-    return Utf8.fromUtf8(buf);
+    return buf.toDartString();
   }
 
   /// Basic information from the JPEG header
   JpegInfo getInfo() {
     // TODO: put into a single allocation
-    final pWidth = allocate<Uint32>();
-    final pHeight = allocate<Uint32>();
-    final pSubsamp = allocate<Uint32>();
-    final pColorspace = allocate<Uint32>();
+    final pWidth = calloc<Uint32>();
+    final pHeight = calloc<Uint32>();
+    final pSubsamp = calloc<Uint32>();
+    final pColorspace = calloc<Uint32>();
 
     // TODO: can try to do this in Dart for possibly better peformance
     int res = _bindings.tjDecompressHeader3(_handle, _jpegBuf, _jpegSize, pWidth, pHeight, pSubsamp, pColorspace);
@@ -282,10 +282,10 @@ class JpegTransformer {
 
     var info = JpegInfo(pWidth.value, pHeight.value, pSubsamp.value, pColorspace.value);
 
-    free(pWidth);
-    free(pHeight);
-    free(pSubsamp);
-    free(pColorspace);
+    calloc.free(pWidth);
+    calloc.free(pHeight);
+    calloc.free(pSubsamp);
+    calloc.free(pColorspace);
 
     return info;
   }
@@ -293,8 +293,8 @@ class JpegTransformer {
   Uint8List transform(JpegTransformation transformation) {
     var tf = transformation._getTransform(this);
 
-    final pDstBufs = allocate<Pointer<Uint8>>(count: 1);
-    final pDstSizes = allocate<IntPtr>(count: 1);
+    final pDstBufs = calloc<Pointer<Uint8>>(1);
+    final pDstSizes = calloc<IntPtr>(1);
 
     pDstBufs.value = Pointer<Uint8>.fromAddress(0);
 
@@ -303,9 +303,9 @@ class JpegTransformer {
     Pointer<Uint8> dstBuf = pDstBufs.value;
     int resultSize = pDstSizes.value;
 
-    free(tf);
-    free(pDstBufs);
-    free(pDstSizes);
+    calloc.free(tf);
+    calloc.free(pDstBufs);
+    calloc.free(pDstSizes);
 
     if (res != 0) {
       throw Exception("JpegTransformer failed: " + _getLastError());
