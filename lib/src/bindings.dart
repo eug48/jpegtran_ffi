@@ -116,23 +116,9 @@ int tjTransform(
   int flags);
 */
 typedef tjTransform_C = Int32 Function(
-    Pointer<TJHandle> handle,
-    Pointer<Uint8> jpegBuf,
-    IntPtr jpegSize,
-    Uint32 n,
-    Pointer<Pointer<Uint8>> dstBufs,
-    Pointer<IntPtr> dstSizes,
-    Pointer<TJTransform> transforms,
-    Uint32 flags);
+    Pointer<TJHandle> handle, Pointer<Uint8> jpegBuf, IntPtr jpegSize, Uint32 n, Pointer<Pointer<Uint8>> dstBufs, Pointer<IntPtr> dstSizes, Pointer<TJTransform> transforms, Uint32 flags);
 typedef tjTransform_Dart = int Function(
-    Pointer<TJHandle> handle,
-    Pointer<Uint8> jpegBuf,
-    int jpegSize,
-    int n,
-    Pointer<Pointer<Uint8>> dstBufs,
-    Pointer<IntPtr> dstSizes,
-    Pointer<TJTransform> transforms,
-    int flags);
+    Pointer<TJHandle> handle, Pointer<Uint8> jpegBuf, int jpegSize, int n, Pointer<Pointer<Uint8>> dstBufs, Pointer<IntPtr> dstSizes, Pointer<TJTransform> transforms, int flags);
 
 /*
 int tjDecompressHeader3(
@@ -145,22 +131,10 @@ int tjDecompressHeader3(
   int *jpegColorspace);
 */
 typedef tjDecompressHeader3_C = Int32 Function(
-    Pointer<TJHandle> handle,
-    Pointer<Uint8> jpegBuf,
-    IntPtr jpegSize,
-    Pointer<Uint32> width,
-    Pointer<Uint32> height,
-    Pointer<Uint32> jpegSubsamp,
-    Pointer<Uint32> jpegColorspace);
+    Pointer<TJHandle> handle, Pointer<Uint8> jpegBuf, IntPtr jpegSize, Pointer<Uint32> width, Pointer<Uint32> height, Pointer<Uint32> jpegSubsamp, Pointer<Uint32> jpegColorspace);
 
 typedef tjDecompressHeader3_Dart = int Function(
-    Pointer<TJHandle> handle,
-    Pointer<Uint8> jpegBuf,
-    int jpegSize,
-    Pointer<Uint32> width,
-    Pointer<Uint32> height,
-    Pointer<Uint32> jpegSubsamp,
-    Pointer<Uint32> jpegColorspace);
+    Pointer<TJHandle> handle, Pointer<Uint8> jpegBuf, int jpegSize, Pointer<Uint32> width, Pointer<Uint32> height, Pointer<Uint32> jpegSubsamp, Pointer<Uint32> jpegColorspace);
 
 class JpegTranBindings {
   tjInitTransform_Dart tjInitTransform;
@@ -175,13 +149,11 @@ class JpegTranBindings {
         ? DynamicLibrary.open("libturbojpeg.so") // android or linux
         : DynamicLibrary.process(); // ios
 
-    tjInitTransform =
-        lib.lookupFunction<tjInitTransform_C, tjInitTransform_Dart>("tjInitTransform");
+    tjInitTransform = lib.lookupFunction<tjInitTransform_C, tjInitTransform_Dart>("tjInitTransform");
 
     tjDestroy = lib.lookupFunction<tjDestroy_C, tjDestroy_Dart>("tjDestroy");
 
-    tjDecompressHeader3 =
-        lib.lookupFunction<tjDecompressHeader3_C, tjDecompressHeader3_Dart>("tjDecompressHeader3");
+    tjDecompressHeader3 = lib.lookupFunction<tjDecompressHeader3_C, tjDecompressHeader3_Dart>("tjDecompressHeader3");
 
     tjTransform = lib.lookupFunction<tjTransform_C, tjTransform_Dart>("tjTransform");
 
