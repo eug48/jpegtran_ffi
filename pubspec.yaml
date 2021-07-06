@@ -1,6 +1,6 @@
 name: jpegtran_ffi
 description: Mostly lossless transformations of JPEG images, implemented using libjpeg-turbo via Dart's FFI.
-version: 0.0.4
+version: 0.0.5
 homepage: https://www.github.com/eug48/jpegtran_ffi
 
 environment:
