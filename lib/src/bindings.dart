@@ -8,7 +8,7 @@ import 'package:ffi/ffi.dart' as ffi_utils;
 //
 //   https://github.com/jbaiter/jpegtran-cffi/tree/master/jpegtran
 
-class TJHandle extends Struct {}
+class TJHandle extends Opaque {}
 
 class TJTransform extends Struct {
   @Int32()
