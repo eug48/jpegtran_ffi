@@ -1,3 +1,8 @@
+## 0.0.6
+
+* Upgraded to flutter 2.5.3-stable
+* Added support for Android v2 embedding
+
 ## 0.0.5
 
 * Upgraded to ffi ^1.1.2
