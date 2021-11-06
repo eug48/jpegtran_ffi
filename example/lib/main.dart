@@ -34,21 +34,21 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             SizedBox(height: 40),
-            RaisedButton(
+            ElevatedButton(
               child: Text("Crop to square"),
               onPressed: () {
                 Navigator.pushNamed(context, '/cropSquare');
               },
             ),
             SizedBox(height: 20),
-            RaisedButton(
+            ElevatedButton(
               child: Text("Operations"),
               onPressed: () {
                 Navigator.pushNamed(context, '/operations');
               },
             ),
             SizedBox(height: 20),
-            RaisedButton(
+            ElevatedButton(
               child: Text("Credits"),
               onPressed: () {
                 Navigator.pushNamed(context, '/credits');

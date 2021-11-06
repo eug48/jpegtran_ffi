@@ -58,7 +58,7 @@ class _OperationsState extends State<OperationsPage> {
       ButtonBar(
         alignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          FlatButton(
+          TextButton(
             child: Text("Crop to center"),
             onPressed: () => _cropToCenter(),
           ),
@@ -67,15 +67,15 @@ class _OperationsState extends State<OperationsPage> {
       ButtonBar(
         alignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          FlatButton(
+          TextButton(
             child: Text("Rotate 90"),
             onPressed: () => _rotate(90),
           ),
-          FlatButton(
+          TextButton(
             child: Text("Rotate 180"),
             onPressed: () => _rotate(180),
           ),
-          FlatButton(
+          TextButton(
             child: Text("Rotate 270"),
             onPressed: () => _rotate(270),
           ),
@@ -84,11 +84,11 @@ class _OperationsState extends State<OperationsPage> {
       ButtonBar(
         alignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          FlatButton(
+          TextButton(
             child: Text("H-flip"),
             onPressed: () => _hflip(),
           ),
-          FlatButton(
+          TextButton(
             child: Text("V-flip"),
             onPressed: () => _vflip(),
           ),
@@ -97,11 +97,11 @@ class _OperationsState extends State<OperationsPage> {
       ButtonBar(
         alignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          FlatButton(
+          TextButton(
             child: Text("Transpose"),
             onPressed: () => _transpose(),
           ),
-          FlatButton(
+          TextButton(
             child: Text("Transverse"),
             onPressed: () => _transverse(),
           ),
@@ -149,7 +149,7 @@ class _OperationsState extends State<OperationsPage> {
         _imageBytes = newImage;
       });
     } catch (err) {
-      var scaffold = Scaffold.of(context);
+      var scaffold = ScaffoldMessenger.of(context);
       scaffold.removeCurrentSnackBar();
       scaffold.showSnackBar(SnackBar(
         content: Text(err.toString()),

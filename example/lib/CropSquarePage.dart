@@ -46,7 +46,7 @@ class _CropSquareState extends State<CropSquarePage> {
             ButtonBar(
               alignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                FlatButton(
+                TextButton(
                   child: Text("Crop to square"),
                   onPressed: () => _cropToSquare(),
                 ),
@@ -55,11 +55,11 @@ class _CropSquareState extends State<CropSquarePage> {
             ButtonBar(
               alignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                FlatButton(
+                TextButton(
                   child: Text("Pick from camera"),
                   onPressed: () => _pickImage(ImageSource.camera),
                 ),
-                FlatButton(
+                TextButton(
                   child: Text("Pick from gallery"),
                   onPressed: () => _pickImage(ImageSource.gallery),
                 ),
@@ -130,7 +130,7 @@ class _CropSquareState extends State<CropSquarePage> {
   }
 
   void _showError(Exception err, BuildContext context) {
-    var scaffold = Scaffold.of(context);
+    var scaffold = ScaffoldMessenger.of(context);
     scaffold.removeCurrentSnackBar();
     scaffold.showSnackBar(SnackBar(
       content: Text(err.toString()),
