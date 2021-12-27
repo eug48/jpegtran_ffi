@@ -1,3 +1,7 @@
+## 0.0.7
+
+* Added `recompress`
+
 ## 0.0.6
 
 * Upgraded to flutter 2.5.3-stable
