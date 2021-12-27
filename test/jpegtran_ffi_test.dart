@@ -4,15 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jpegtran_ffi/jpegtran_ffi.dart';
 
 void main() {
+  setUp(() {});
 
-  setUp(() {
-  });
-
-  tearDown(() {
-  });
+  tearDown(() {});
 
   test('bad jpeg', () async {
-    var transformer = JpegTransformer(Uint8List.fromList([1,2,3]));
+    var transformer = JpegTransformer(Uint8List.fromList([1, 2, 3]));
     transformer.getInfo();
   });
 }
