@@ -116,9 +116,23 @@ int tjTransform(
   int flags);
 */
 typedef TJTransformC = Int32 Function(
-    Pointer<TJHandle> handle, Pointer<Uint8> jpegBuf, IntPtr jpegSize, Uint32 n, Pointer<Pointer<Uint8>> dstBufs, Pointer<IntPtr> dstSizes, Pointer<TJTransform> transforms, Uint32 flags);
+    Pointer<TJHandle> handle,
+    Pointer<Uint8> jpegBuf,
+    IntPtr jpegSize,
+    Uint32 n,
+    Pointer<Pointer<Uint8>> dstBufs,
+    Pointer<IntPtr> dstSizes,
+    Pointer<TJTransform> transforms,
+    Uint32 flags);
 typedef TJTransformDart = int Function(
-    Pointer<TJHandle> handle, Pointer<Uint8> jpegBuf, int jpegSize, int n, Pointer<Pointer<Uint8>> dstBufs, Pointer<IntPtr> dstSizes, Pointer<TJTransform> transforms, int flags);
+    Pointer<TJHandle> handle,
+    Pointer<Uint8> jpegBuf,
+    int jpegSize,
+    int n,
+    Pointer<Pointer<Uint8>> dstBufs,
+    Pointer<IntPtr> dstSizes,
+    Pointer<TJTransform> transforms,
+    int flags);
 
 /*
 unsigned long tjBufSizeYUV2(
@@ -225,10 +239,22 @@ int tjDecompressHeader3(
   int *jpegColorspace);
 */
 typedef TJDecompressHeader3C = Int32 Function(
-    Pointer<TJHandle> handle, Pointer<Uint8> jpegBuf, IntPtr jpegSize, Pointer<Uint32> width, Pointer<Uint32> height, Pointer<Uint32> jpegSubsamp, Pointer<Uint32> jpegColorspace);
+    Pointer<TJHandle> handle,
+    Pointer<Uint8> jpegBuf,
+    IntPtr jpegSize,
+    Pointer<Uint32> width,
+    Pointer<Uint32> height,
+    Pointer<Uint32> jpegSubsamp,
+    Pointer<Uint32> jpegColorspace);
 
 typedef TJDecompressHeader3Dart = int Function(
-    Pointer<TJHandle> handle, Pointer<Uint8> jpegBuf, int jpegSize, Pointer<Uint32> width, Pointer<Uint32> height, Pointer<Uint32> jpegSubsamp, Pointer<Uint32> jpegColorspace);
+    Pointer<TJHandle> handle,
+    Pointer<Uint8> jpegBuf,
+    int jpegSize,
+    Pointer<Uint32> width,
+    Pointer<Uint32> height,
+    Pointer<Uint32> jpegSubsamp,
+    Pointer<Uint32> jpegColorspace);
 
 class JpegTranBindings {
   TJInitDart tjInitCompress;
@@ -238,7 +264,7 @@ class JpegTranBindings {
   TJDecompressHeader3Dart tjDecompressHeader3;
   TJBufSizeYUV2Dart tjBufSizeYUV2;
   TJDecompressToYUV2Dart tjDecompressToYUV2;
-  TJCompressFromYUVDart tjCompressFromYUV; 
+  TJCompressFromYUVDart tjCompressFromYUV;
   TJTransformDart tjTransform;
   TJFreeDart tjFree;
   TJGetErrorStrDart tjGetErrorStr;
@@ -249,20 +275,31 @@ class JpegTranBindings {
         : DynamicLibrary.process(); // ios
 
     tjInitCompress = lib.lookupFunction<TJInitC, TJInitDart>("tjInitCompress");
-    tjInitDecompress = lib.lookupFunction<TJInitC, TJInitDart>("tjInitDecompress");
-    tjInitTransform = lib.lookupFunction<TJInitC, TJInitDart>("tjInitTransform");
+    tjInitDecompress =
+        lib.lookupFunction<TJInitC, TJInitDart>("tjInitDecompress");
+    tjInitTransform =
+        lib.lookupFunction<TJInitC, TJInitDart>("tjInitTransform");
 
     tjDestroy = lib.lookupFunction<TJDestroyC, TJDestroyDart>("tjDestroy");
 
-    tjDecompressHeader3 = lib.lookupFunction<TJDecompressHeader3C, TJDecompressHeader3Dart>("tjDecompressHeader3");
-    tjBufSizeYUV2 = lib.lookupFunction<TJBufSizeYUV2C, TJBufSizeYUV2Dart>("tjBufSizeYUV2");
-    tjDecompressToYUV2 = lib.lookupFunction<TJDecompressToYUV2C, TJDecompressToYUV2Dart>("tjDecompressToYUV2");
-    tjCompressFromYUV = lib.lookupFunction<TJCompressFromYUVC, TJCompressFromYUVDart>("tjCompressFromYUV");
+    tjDecompressHeader3 =
+        lib.lookupFunction<TJDecompressHeader3C, TJDecompressHeader3Dart>(
+            "tjDecompressHeader3");
+    tjBufSizeYUV2 =
+        lib.lookupFunction<TJBufSizeYUV2C, TJBufSizeYUV2Dart>("tjBufSizeYUV2");
+    tjDecompressToYUV2 =
+        lib.lookupFunction<TJDecompressToYUV2C, TJDecompressToYUV2Dart>(
+            "tjDecompressToYUV2");
+    tjCompressFromYUV =
+        lib.lookupFunction<TJCompressFromYUVC, TJCompressFromYUVDart>(
+            "tjCompressFromYUV");
 
-    tjTransform = lib.lookupFunction<TJTransformC, TJTransformDart>("tjTransform");
+    tjTransform =
+        lib.lookupFunction<TJTransformC, TJTransformDart>("tjTransform");
 
     tjFree = lib.lookupFunction<TJFreeC, TJFreeDart>("tjFree");
 
-    tjGetErrorStr = lib.lookupFunction<TJGetErrorStrC, TJGetErrorStrDart>("tjGetErrorStr");
+    tjGetErrorStr =
+        lib.lookupFunction<TJGetErrorStrC, TJGetErrorStrDart>("tjGetErrorStr");
   }
 }

@@ -17,8 +17,9 @@ class _OperationsState extends State<OperationsPage> {
   @override
   void initState() {
     super.initState();
+    var asset = 'assets/New_born_Frisian_red_white_calf-320px.jpg';
+    var initialImage = rootBundle.load(asset);
 
-    var initialImage = rootBundle.load('assets/New_born_Frisian_red_white_calf-320px.jpg');
     initialImage.then((value) {
       setState(() {
         _imageBytes = value.buffer.asUint8List();
@@ -173,7 +174,8 @@ class _OperationsState extends State<OperationsPage> {
     var jpegtran = JpegTransformer(_imageBytes);
     try {
       var info = jpegtran.getInfo();
-      print("transform input: ${info.width}x${info.height}   ${_imageBytes.lengthInBytes} bytes");
+      print("transform input: ${info.width}x${info.height}, "
+          "${_imageBytes.lengthInBytes} bytes");
       var newImage = jpegtran.transform(t);
       setState(() {
         _imageBytes = newImage;
@@ -187,7 +189,8 @@ class _OperationsState extends State<OperationsPage> {
     var jpegtran = JpegTransformer(_imageBytes);
     try {
       var info = jpegtran.getInfo();
-      print("recompress input: ${info.width}x${info.height}   ${_imageBytes.lengthInBytes} bytes");
+      print("recompress input: ${info.width}x${info.height}, "
+          "${_imageBytes.lengthInBytes} bytes");
       var newImage = jpegtran.recompress(quality: 50);
       setState(() {
         _imageBytes = newImage;

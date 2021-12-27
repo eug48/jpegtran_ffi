@@ -20,7 +20,8 @@ class _CropSquareState extends State<CropSquarePage> {
   void initState() {
     super.initState();
 
-    var initialImage = rootBundle.load('assets/New_born_Frisian_red_white_calf-320px.jpg');
+    var asset = 'assets/New_born_Frisian_red_white_calf-320px.jpg';
+    var initialImage = rootBundle.load(asset);
     initialImage.then((value) {
       setState(() {
         _imageBytes = value.buffer.asUint8List();
@@ -95,8 +96,9 @@ class _CropSquareState extends State<CropSquarePage> {
     var jpegtran = JpegTransformer(_imageBytes);
     try {
       var info = jpegtran.getInfo();
-      print("transform input: ${info.width}x${info.height}, ${_imageBytes.lengthInBytes} bytes");
-      print("transform input: subsamp: ${info.subsampString}");
+      print("transform input: ${info.width}x${info.height}, "
+          "subsamp: ${info.subsampString}, "
+          "${_imageBytes.lengthInBytes} bytes");
 
       JpegCrop crop;
       if (info.width > info.height) {

@@ -60,11 +60,15 @@ class JpegOptions {
   /// (sets TJXOPT_GRAY)
   final bool grayscale;
 
-  const JpegOptions({this.trimIfLossy = true, this.failIfLossy = false, this.grayscale = false});
+  const JpegOptions(
+      {this.trimIfLossy = true,
+      this.failIfLossy = false,
+      this.grayscale = false});
 
   void _applyToTransform(TJTransform tf) {
     if (trimIfLossy && failIfLossy) {
-      throw Exception("JpegOptions: invalid to enable both trimIfLossy and failIfLossy");
+      throw Exception(
+          "JpegOptions: invalid to enable both trimIfLossy and failIfLossy");
     }
 
     if (trimIfLossy) {
@@ -79,7 +83,8 @@ class JpegOptions {
   }
 }
 
-Pointer<TJTransform> _allocateTransform(TJXOP op, JpegCrop crop, JpegOptions options, JpegTransformer transformer) {
+Pointer<TJTransform> _allocateTransform(
+    TJXOP op, JpegCrop crop, JpegOptions options, JpegTransformer transformer) {
   final p = calloc<TJTransform>();
   final tf = p.ref;
   tf.init();
@@ -105,7 +110,13 @@ class JpegCrop implements JpegTransformation {
 
   final JpegOptions options;
 
-  JpegCrop({@required this.x, @required this.y, @required this.w, @required this.h, this.alignIfRequired = true, this.options = const JpegOptions()});
+  JpegCrop(
+      {@required this.x,
+      @required this.y,
+      @required this.w,
+      @required this.h,
+      this.alignIfRequired = true,
+      this.options = const JpegOptions()});
 
   @override
   Pointer<TJTransform> _getTransform(JpegTransformer transformer) {
@@ -143,7 +154,11 @@ class JpegRotation implements JpegTransformation {
   final int angle;
   TJXOP _op;
 
-  JpegRotation({@required this.angle, this.crop, this.options = const JpegOptions()}) {
+  JpegRotation({
+    @required this.angle,
+    this.crop,
+    this.options = const JpegOptions(),
+  }) {
     switch (this.angle) {
       case 90:
         _op = TJXOP.ROT90;
@@ -278,13 +293,26 @@ class JpegTransformer {
     final pColorspace = calloc<Uint32>();
 
     // TODO: can try to do this in Dart for possibly better peformance
-    int res = _bindings.tjDecompressHeader3(_handleTransform, _jpegBuf, _jpegSize, pWidth, pHeight, pSubsamp, pColorspace);
+    int res = _bindings.tjDecompressHeader3(
+      _handleTransform,
+      _jpegBuf,
+      _jpegSize,
+      pWidth,
+      pHeight,
+      pSubsamp,
+      pColorspace,
+    );
 
     if (res != 0) {
       throw Exception("tjDecompressHeader3 failed: " + _getLastError());
     }
 
-    var info = JpegInfo(pWidth.value, pHeight.value, pSubsamp.value, pColorspace.value);
+    var info = JpegInfo(
+      pWidth.value,
+      pHeight.value,
+      pSubsamp.value,
+      pColorspace.value,
+    );
 
     calloc.free(pWidth);
     calloc.free(pHeight);
@@ -302,7 +330,16 @@ class JpegTransformer {
 
     pDstBufs.value = Pointer<Uint8>.fromAddress(0);
 
-    int res = _bindings.tjTransform(_handleTransform, _jpegBuf, _jpegSize, 1, pDstBufs, pDstSizes, tf, 0);
+    int res = _bindings.tjTransform(
+      _handleTransform,
+      _jpegBuf,
+      _jpegSize,
+      1,
+      pDstBufs,
+      pDstSizes,
+      tf,
+      0,
+    );
 
     Pointer<Uint8> dstBuf = pDstBufs.value;
     int resultSize = pDstSizes.value;
@@ -327,10 +364,24 @@ class JpegTransformer {
     int pad = 4;
     int flags = 0;
 
-    int yuvBufSize = _bindings.tjBufSizeYUV2(info.width, pad, info.height, info.subsamp);
+    int yuvBufSize = _bindings.tjBufSizeYUV2(
+      info.width,
+      pad,
+      info.height,
+      info.subsamp,
+    );
     final yuvBuf = calloc<Uint8>(yuvBufSize);
 
-    int res = _bindings.tjDecompressToYUV2(_handleDecompress, _jpegBuf, _jpegSize, yuvBuf, info.width, pad, info.height, flags);
+    int res = _bindings.tjDecompressToYUV2(
+      _handleDecompress,
+      _jpegBuf,
+      _jpegSize,
+      yuvBuf,
+      info.width,
+      pad,
+      info.height,
+      flags,
+    );
     if (res != 0) {
       calloc.free(yuvBuf);
       throw Exception("tjDecompressToYUV2 failed: " + _getLastError());
@@ -339,7 +390,18 @@ class JpegTransformer {
     final pDstBuf = calloc<Pointer<Uint8>>(1);
     pDstBuf.value = Pointer<Uint8>.fromAddress(0);
     final pJpegSize = calloc<IntPtr>();
-    res = _bindings.tjCompressFromYUV(_handleCompress, yuvBuf, info.width, pad, info.height, info.subsamp, pDstBuf, pJpegSize, quality, flags);
+    res = _bindings.tjCompressFromYUV(
+      _handleCompress,
+      yuvBuf,
+      info.width,
+      pad,
+      info.height,
+      info.subsamp,
+      pDstBuf,
+      pJpegSize,
+      quality,
+      flags,
+    );
 
     Pointer<Uint8> dstBuf = pDstBuf.value;
     int jpegSize = pJpegSize.value;
