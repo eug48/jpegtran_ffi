@@ -41,6 +41,7 @@ class _OperationsState extends State<OperationsPage> {
           children: [
             SizedBox(height: 10),
             Expanded(child: Image.memory(_imageBytes)),
+            Text("${_imageBytes.lengthInBytes} bytes"),
             Expanded(
                 flex: 2,
                 child: ListView(
@@ -107,6 +108,15 @@ class _OperationsState extends State<OperationsPage> {
           ),
         ],
       ),
+      ButtonBar(
+        alignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          TextButton(
+            child: Text("Recompress"),
+            onPressed: () => _recompress(),
+          ),
+        ],
+      ),
     ];
   }
 
@@ -165,6 +175,20 @@ class _OperationsState extends State<OperationsPage> {
       var info = jpegtran.getInfo();
       print("transform input: ${info.width}x${info.height}   ${_imageBytes.lengthInBytes} bytes");
       var newImage = jpegtran.transform(t);
+      setState(() {
+        _imageBytes = newImage;
+      });
+    } finally {
+      jpegtran.dispose();
+    }
+  }
+
+  void _recompress() {
+    var jpegtran = JpegTransformer(_imageBytes);
+    try {
+      var info = jpegtran.getInfo();
+      print("recompress input: ${info.width}x${info.height}   ${_imageBytes.lengthInBytes} bytes");
+      var newImage = jpegtran.recompress(quality: 50);
       setState(() {
         _imageBytes = newImage;
       });

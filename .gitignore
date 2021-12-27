@@ -9,3 +9,4 @@ build/
 .externalNativeBuild/
 
 .history
+example/.flutter-plugins-dependencies

@@ -1,11 +1,15 @@
 # jpegtran_ffi
 
-Mostly lossless transformations for JPEG images, implemented using libjpeg-turbo via Dart's FFI.
+Lossless transformations of JPEG images, similar to those than can be made using `jpegtran` tool, e.g. cropping and rotations. Since JPEG data doesn't need to be decoded or encoded it should hopefully be fast as well.
+
+A lossy recompress method to reduce quality & size is also included.
+
+This package uses [libjpeg-turbo](https://libjpeg-turbo.org/) via Dart's FFI. Unlike platform plugins it should be usable from within isolates.
 
 ## Example
 
 ```dart
-void _cropToSquareRotate() {
+void _cropToSquareAndRotate() {
     var jpegtran = JpegTransformer(_imageBytes);
     try {
         var info = jpegtran.getInfo();
@@ -41,3 +45,4 @@ void _cropToSquareRotate() {
 ## TODO
 
 * Remove unneeded parts of libjpeg-turbo
+* Lossy resizing

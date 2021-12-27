@@ -234,12 +234,16 @@ class JpegTransverse implements JpegTransformation {
 /// Users need to call dispose to free memory
 class JpegTransformer {
   static final JpegTranBindings _bindings = JpegTranBindings();
-  Pointer<TJHandle> _handle;
+  Pointer<TJHandle> _handleCompress;
+  Pointer<TJHandle> _handleDecompress;
+  Pointer<TJHandle> _handleTransform;
   Pointer<Uint8> _jpegBuf;
   int _jpegSize;
 
   JpegTransformer(Uint8List jpegBytes) {
-    _handle = _bindings.tjInitTransform();
+    _handleCompress = _bindings.tjInitCompress();
+    _handleDecompress = _bindings.tjInitDecompress();
+    _handleTransform = _bindings.tjInitTransform();
 
     _jpegBuf = calloc<Uint8>(jpegBytes.length);
     _jpegSize = jpegBytes.length;
@@ -254,7 +258,7 @@ class JpegTransformer {
   void dispose() {
     calloc.free(_jpegBuf);
 
-    int res = _bindings.tjDestroy(_handle);
+    int res = _bindings.tjDestroy(_handleTransform);
     if (res != 0) {
       throw Exception("tjDestroy failed");
     }
@@ -274,7 +278,7 @@ class JpegTransformer {
     final pColorspace = calloc<Uint32>();
 
     // TODO: can try to do this in Dart for possibly better peformance
-    int res = _bindings.tjDecompressHeader3(_handle, _jpegBuf, _jpegSize, pWidth, pHeight, pSubsamp, pColorspace);
+    int res = _bindings.tjDecompressHeader3(_handleTransform, _jpegBuf, _jpegSize, pWidth, pHeight, pSubsamp, pColorspace);
 
     if (res != 0) {
       throw Exception("tjDecompressHeader3 failed: " + _getLastError());
@@ -298,7 +302,7 @@ class JpegTransformer {
 
     pDstBufs.value = Pointer<Uint8>.fromAddress(0);
 
-    int res = _bindings.tjTransform(_handle, _jpegBuf, _jpegSize, 1, pDstBufs, pDstSizes, tf, 0);
+    int res = _bindings.tjTransform(_handleTransform, _jpegBuf, _jpegSize, 1, pDstBufs, pDstSizes, tf, 0);
 
     Pointer<Uint8> dstBuf = pDstBufs.value;
     int resultSize = pDstSizes.value;
@@ -312,6 +316,43 @@ class JpegTransformer {
     }
 
     Uint8List dstBufDart = dstBuf.asTypedList(resultSize);
+    Uint8List outBytes = Uint8List.fromList(dstBufDart);
+    _bindings.tjFree(dstBuf);
+
+    return outBytes;
+  }
+
+  Uint8List recompress({quality = 80}) {
+    JpegInfo info = getInfo();
+    int pad = 4;
+    int flags = 0;
+
+    int yuvBufSize = _bindings.tjBufSizeYUV2(info.width, pad, info.height, info.subsamp);
+    final yuvBuf = calloc<Uint8>(yuvBufSize);
+
+    int res = _bindings.tjDecompressToYUV2(_handleDecompress, _jpegBuf, _jpegSize, yuvBuf, info.width, pad, info.height, flags);
+    if (res != 0) {
+      calloc.free(yuvBuf);
+      throw Exception("tjDecompressToYUV2 failed: " + _getLastError());
+    }
+
+    final pDstBuf = calloc<Pointer<Uint8>>(1);
+    pDstBuf.value = Pointer<Uint8>.fromAddress(0);
+    final pJpegSize = calloc<IntPtr>();
+    res = _bindings.tjCompressFromYUV(_handleCompress, yuvBuf, info.width, pad, info.height, info.subsamp, pDstBuf, pJpegSize, quality, flags);
+
+    Pointer<Uint8> dstBuf = pDstBuf.value;
+    int jpegSize = pJpegSize.value;
+
+    calloc.free(yuvBuf);
+    calloc.free(pDstBuf);
+    calloc.free(pJpegSize);
+
+    if (res != 0) {
+      throw Exception("tjCompressFromYUV failed: " + _getLastError());
+    }
+
+    Uint8List dstBufDart = dstBuf.asTypedList(jpegSize);
     Uint8List outBytes = Uint8List.fromList(dstBufDart);
     _bindings.tjFree(dstBuf);
 
