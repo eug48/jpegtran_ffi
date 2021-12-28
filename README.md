@@ -9,7 +9,7 @@ This package uses [libjpeg-turbo](https://libjpeg-turbo.org/) via Dart's FFI. Un
 ## Example
 
 ```dart
-void _cropToSquareAndRotate() {
+void cropToSquareAndRotate() {
     var jpegtran = JpegTransformer(_imageBytes);
     try {
         var info = jpegtran.getInfo();
@@ -41,6 +41,19 @@ void _cropToSquareAndRotate() {
 }
 ```
 
+```dart
+Uint8List recompress(Uint8List jpegBytes) {
+  var jpegtran = JpegTransformer(jpegBytes);
+  try {
+    return jpegtran.recompress(
+      quality: 70,
+      preserveEXIF: true,
+    );
+  } finally {
+    jpegtran.dispose();
+  }
+}
+```
 
 ## TODO
 
