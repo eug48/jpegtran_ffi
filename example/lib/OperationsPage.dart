@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -5,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:jpegtran_ffi/jpegtran_ffi.dart';
+import 'package:jpegtran_ffi/JpegSegment.dart';
 
 class OperationsPage extends StatefulWidget {
   @override
@@ -33,6 +36,9 @@ class _OperationsState extends State<OperationsPage> {
       return CircularProgressIndicator();
     }
 
+    var segments = JpegSegment.readHeaders(_imageBytes);
+    segments.forEach((segment) => print("have segment $segment"));
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Operations'),
@@ -44,7 +50,7 @@ class _OperationsState extends State<OperationsPage> {
             Expanded(child: Image.memory(_imageBytes)),
             Text("${_imageBytes.lengthInBytes} bytes"),
             Expanded(
-                flex: 2,
+                flex: 1,
                 child: ListView(
                   shrinkWrap: true,
                   children: buildButtonBars(),
@@ -113,8 +119,8 @@ class _OperationsState extends State<OperationsPage> {
         alignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           TextButton(
-            child: Text("Recompress"),
-            onPressed: () => _recompress(),
+            child: Text("Recompress (q=75)"),
+            onPressed: () => _recompress(quality: 75),
           ),
         ],
       ),
@@ -185,13 +191,27 @@ class _OperationsState extends State<OperationsPage> {
     }
   }
 
-  void _recompress() {
+  void _recompress({int quality, bool keepEXIF = true}) {
     var jpegtran = JpegTransformer(_imageBytes);
     try {
       var info = jpegtran.getInfo();
       print("recompress input: ${info.width}x${info.height}, "
           "${_imageBytes.lengthInBytes} bytes");
-      var newImage = jpegtran.recompress(quality: 50);
+      var newImage = jpegtran.recompress(quality: quality);
+
+      if (keepEXIF) {
+        // can also use an IOSink (File("abc").openWrite())
+        var sink = BytesIOSink();
+
+        JpegSegment.rewriteWithAlternateAppSegments(
+            jpegToWrite: newImage,
+            jpegWithAppSegmentsToUse: _imageBytes,
+            writer: sink);
+
+        newImage = sink.bytes.takeBytes();
+        sink.close();
+      }
+
       setState(() {
         _imageBytes = newImage;
       });
@@ -199,4 +219,21 @@ class _OperationsState extends State<OperationsPage> {
       jpegtran.dispose();
     }
   }
+}
+
+class BytesIOSink implements EventSink<List<int>> {
+  final BytesBuilder bytes = BytesBuilder();
+
+  @override
+  void add(List<int> data) {
+    bytes.add(data);
+  }
+
+  @override
+  void addError(Object error, [StackTrace stackTrace]) {
+    throw error;
+  }
+
+  @override
+  void close() {}
 }

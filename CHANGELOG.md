@@ -1,3 +1,7 @@
+# 0.0.8
+
+* Added `JpegSegment` to support loading and preserving EXIF data
+
 ## 0.0.7
 
 * Added `recompress`
