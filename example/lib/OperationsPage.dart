@@ -13,7 +13,7 @@ class OperationsPage extends StatefulWidget {
 }
 
 class _OperationsState extends State<OperationsPage> {
-  Uint8List _imageBytes;
+  Uint8List? _imageBytes;
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _OperationsState extends State<OperationsPage> {
     }
 
     print("-----------");
-    var segments = JpegSegment.readHeaders(_imageBytes);
+    var segments = JpegSegment.readHeaders(_imageBytes!);
     segments.forEach((segment) => print("have $segment"));
     print("-----------");
 
@@ -47,8 +47,8 @@ class _OperationsState extends State<OperationsPage> {
         child: Column(
           children: [
             SizedBox(height: 10),
-            Expanded(child: Image.memory(_imageBytes)),
-            Text("${_imageBytes.lengthInBytes} bytes"),
+            Expanded(child: Image.memory(_imageBytes!)),
+            Text("${_imageBytes!.lengthInBytes} bytes"),
             Expanded(
                 flex: 1,
                 child: ListView(
@@ -148,12 +148,12 @@ class _OperationsState extends State<OperationsPage> {
   }
 
   void _cropToCenter() {
-    var jpegtran = JpegTransformer(_imageBytes);
+    var jpegtran = JpegTransformer(_imageBytes!);
     try {
       var info = jpegtran.getInfo();
       print("transform input: ${info.width}x${info.height}");
       print("transform input: subsamp: ${info.subsampString}");
-      print("transform input: ${_imageBytes.lengthInBytes} bytes");
+      print("transform input: ${_imageBytes!.lengthInBytes} bytes");
 
       var crop = JpegCrop(
           alignIfRequired: true,
@@ -177,11 +177,11 @@ class _OperationsState extends State<OperationsPage> {
   }
 
   void transform(JpegTransformation t) {
-    var jpegtran = JpegTransformer(_imageBytes);
+    var jpegtran = JpegTransformer(_imageBytes!);
     try {
       var info = jpegtran.getInfo();
       print("transform input: ${info.width}x${info.height}, "
-          "${_imageBytes.lengthInBytes} bytes");
+          "${_imageBytes!.lengthInBytes} bytes");
       var newImage = jpegtran.transform(t);
       setState(() {
         _imageBytes = newImage;
@@ -191,12 +191,12 @@ class _OperationsState extends State<OperationsPage> {
     }
   }
 
-  void _recompress({int quality, bool preserveEXIF = true}) {
-    var jpegtran = JpegTransformer(_imageBytes);
+  void _recompress({required int quality, bool preserveEXIF = true}) {
+    var jpegtran = JpegTransformer(_imageBytes!);
     try {
       var info = jpegtran.getInfo();
       print("recompress input: ${info.width}x${info.height}, "
-          "${_imageBytes.lengthInBytes} bytes");
+          "${_imageBytes!.lengthInBytes} bytes");
       var newImage = jpegtran.recompress(
         quality: quality,
         preserveEXIF: preserveEXIF,

@@ -1,20 +1,20 @@
 name: jpegtran_ffi_example
 description: Demonstrates how to use the jpegtran_ffi plugin.
-publish_to: 'none'
+publish_to: "none"
 
 environment:
-  sdk: ">=2.5.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
   flutter: ">=1.12.0"
 
 dependencies:
-  image_picker:
+  image_picker: 0.8.4+4
 
   flutter:
     sdk: flutter
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.2
+  cupertino_icons: 1.0.4
 
 dev_dependencies:
   flutter_test:
@@ -28,14 +28,13 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
 
   assets:
-   - assets/New_born_Frisian_red_white_calf-320px.jpg
+    - assets/New_born_Frisian_red_white_calf-320px.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

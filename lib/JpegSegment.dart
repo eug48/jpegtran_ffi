@@ -91,9 +91,9 @@ class JpegSegment {
   /// Writes out a JPEG but uses the APP segments from another JPEG
   /// Useful in preserving EXIF data
   static rewriteWithAlternateAppSegments({
-    Uint8List jpegToWrite,
-    Uint8List jpegWithAppSegmentsToUse,
-    EventSink<List<int>> writer,
+    required Uint8List jpegToWrite,
+    required Uint8List jpegWithAppSegmentsToUse,
+    required EventSink<List<int>> writer,
   }) {
     var segments = readHeaders(jpegToWrite);
     var appSegments =

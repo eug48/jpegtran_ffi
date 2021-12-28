@@ -3,7 +3,6 @@ import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
-import 'package:flutter/foundation.dart';
 
 import 'src/bindings.dart';
 import 'JpegSegment.dart';
@@ -87,8 +86,8 @@ class JpegOptions {
   }
 }
 
-Pointer<TJTransform> _allocateTransform(
-    TJXOP op, JpegCrop crop, JpegOptions options, JpegTransformer transformer) {
+Pointer<TJTransform> _allocateTransform(TJXOP op, JpegCrop? crop,
+    JpegOptions options, JpegTransformer transformer) {
   final p = calloc<TJTransform>();
   final tf = p.ref;
   tf.init();
@@ -115,10 +114,10 @@ class JpegCrop implements JpegTransformation {
   final JpegOptions options;
 
   JpegCrop(
-      {@required this.x,
-      @required this.y,
-      @required this.w,
-      @required this.h,
+      {required this.x,
+      required this.y,
+      required this.w,
+      required this.h,
       this.alignIfRequired = true,
       this.options = const JpegOptions()});
 
@@ -153,13 +152,13 @@ class JpegCrop implements JpegTransformation {
 /// 180 degrees - transform is imperfect if there are any partial MCU blocks in the image
 /// 270 degrees -  transform is imperfect if there are any partial MCU blocks on the right edge
 class JpegRotation implements JpegTransformation {
-  final JpegCrop crop;
+  final JpegCrop? crop;
   final JpegOptions options;
   final int angle;
-  TJXOP _op;
+  late TJXOP _op;
 
   JpegRotation({
-    @required this.angle,
+    required this.angle,
     this.crop,
     this.options = const JpegOptions(),
   }) {
@@ -189,7 +188,7 @@ class JpegRotation implements JpegTransformation {
 /// Transform is imperfect if there are any partial MCU blocks on the right edge
 /// Behaviour in this case is governed by options (image trimmed by default)
 class JpegHFlip implements JpegTransformation {
-  final JpegCrop crop;
+  final JpegCrop? crop;
   final JpegOptions options;
 
   JpegHFlip({this.crop, this.options = const JpegOptions()});
@@ -205,7 +204,7 @@ class JpegHFlip implements JpegTransformation {
 /// Transform is imperfect if there are any partial MCU blocks on the bottom edge
 /// Behaviour in this case is governed by options (image trimmed by default)
 class JpegVFlip implements JpegTransformation {
-  final JpegCrop crop;
+  final JpegCrop? crop;
   final JpegOptions options;
 
   JpegVFlip({this.crop, this.options = const JpegOptions()});
@@ -220,7 +219,7 @@ class JpegVFlip implements JpegTransformation {
 ///
 /// This transform is always perfect.
 class JpegTranspose implements JpegTransformation {
-  final JpegCrop crop;
+  final JpegCrop? crop;
   final JpegOptions options;
 
   JpegTranspose({this.crop, this.options = const JpegOptions()});
@@ -236,7 +235,7 @@ class JpegTranspose implements JpegTransformation {
 /// This transform is imperfect if there are any partial MCU blocks in the image
 /// Behaviour in this case is governed by options (image trimmed by default)
 class JpegTransverse implements JpegTransformation {
-  final JpegCrop crop;
+  final JpegCrop? crop;
   final JpegOptions options;
 
   JpegTransverse({this.crop, this.options = const JpegOptions()});
@@ -257,20 +256,19 @@ class JpegTransverse implements JpegTransformation {
 /// Users need to call `dispose` to free memory
 class JpegTransformer {
   static final JpegTranBindings _bindings = JpegTranBindings();
-  Pointer<TJHandle> _handleCompress;
-  Pointer<TJHandle> _handleDecompress;
-  Pointer<TJHandle> _handleTransform;
+  late Pointer<TJHandle> _handleCompress;
+  late Pointer<TJHandle> _handleDecompress;
+  late Pointer<TJHandle> _handleTransform;
   Pointer<Uint8> _jpegBuf;
   Uint8List jpegBytes;
   int _jpegSize;
 
-  JpegTransformer(this.jpegBytes) {
+  JpegTransformer(this.jpegBytes)
+      : _jpegBuf = calloc<Uint8>(jpegBytes.length),
+        _jpegSize = jpegBytes.length {
     _handleCompress = _bindings.tjInitCompress();
     _handleDecompress = _bindings.tjInitDecompress();
     _handleTransform = _bindings.tjInitTransform();
-
-    _jpegBuf = calloc<Uint8>(jpegBytes.length);
-    _jpegSize = jpegBytes.length;
 
     // TODO: can this copying be avoided?
     Uint8List jpegBufDart = _jpegBuf.asTypedList(_jpegSize);
@@ -404,7 +402,7 @@ class JpegTransformer {
     }
   }
 
-  Uint8List _recompress({int quality}) {
+  Uint8List _recompress({required int quality}) {
     JpegInfo info = getInfo();
     int pad = 4;
     int flags = 0;
@@ -476,7 +474,7 @@ class _BytesIOSink implements EventSink<List<int>> {
   }
 
   @override
-  void addError(Object error, [StackTrace stackTrace]) {
+  void addError(Object error, [StackTrace? stackTrace]) {
     throw error;
   }
 

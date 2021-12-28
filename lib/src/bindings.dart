@@ -12,26 +12,26 @@ class TJHandle extends Opaque {}
 
 class TJTransform extends Struct {
   @Int32()
-  int x;
+  external int x;
 
   @Int32()
-  int y;
+  external int y;
 
   @Int32()
-  int w;
+  external int? w;
 
   @Int32()
-  int h;
+  external int? h;
 
   @Int32()
-  int op;
+  external int? op;
 
   @Int32()
-  int options;
+  external int options;
 
-  Pointer<Void> data;
+  external Pointer<Void>? data;
 
-  Pointer<Void> pCustomFilter;
+  external Pointer<Void>? pCustomFilter;
 
   void init() {
     x = 0;
@@ -257,17 +257,17 @@ typedef TJDecompressHeader3Dart = int Function(
     Pointer<Uint32> jpegColorspace);
 
 class JpegTranBindings {
-  TJInitDart tjInitCompress;
-  TJInitDart tjInitDecompress;
-  TJInitDart tjInitTransform;
-  TJDestroyDart tjDestroy;
-  TJDecompressHeader3Dart tjDecompressHeader3;
-  TJBufSizeYUV2Dart tjBufSizeYUV2;
-  TJDecompressToYUV2Dart tjDecompressToYUV2;
-  TJCompressFromYUVDart tjCompressFromYUV;
-  TJTransformDart tjTransform;
-  TJFreeDart tjFree;
-  TJGetErrorStrDart tjGetErrorStr;
+  late TJInitDart tjInitCompress;
+  late TJInitDart tjInitDecompress;
+  late TJInitDart tjInitTransform;
+  late TJDestroyDart tjDestroy;
+  late TJDecompressHeader3Dart tjDecompressHeader3;
+  late TJBufSizeYUV2Dart tjBufSizeYUV2;
+  late TJDecompressToYUV2Dart tjDecompressToYUV2;
+  late TJCompressFromYUVDart tjCompressFromYUV;
+  late TJTransformDart tjTransform;
+  late TJFreeDart tjFree;
+  late TJGetErrorStrDart tjGetErrorStr;
 
   JpegTranBindings() {
     final DynamicLibrary lib = (Platform.isAndroid || Platform.isLinux)

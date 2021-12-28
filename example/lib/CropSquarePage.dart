@@ -14,7 +14,7 @@ class CropSquarePage extends StatefulWidget {
 }
 
 class _CropSquareState extends State<CropSquarePage> {
-  Uint8List _imageBytes;
+  Uint8List? _imageBytes;
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _CropSquareState extends State<CropSquarePage> {
         child: Column(
           children: <Widget>[
             SizedBox(height: 10),
-            Expanded(child: Image.memory(_imageBytes)),
+            Expanded(child: Image.memory(_imageBytes!)),
             ButtonBar(
               alignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
@@ -74,9 +74,9 @@ class _CropSquareState extends State<CropSquarePage> {
   }
 
   void _pickImage(ImageSource source) async {
-    File file;
+    XFile? file;
     try {
-      file = await ImagePicker.pickImage(source: source);
+      file = await ImagePicker().pickImage(source: source);
       if (file == null) {
         return;
       }
@@ -88,19 +88,22 @@ class _CropSquareState extends State<CropSquarePage> {
     } catch (err) {
       _showError(err, context);
     } finally {
-      file?.deleteSync();
+      var path = file?.path;
+      if (path != null) {
+        File(path).deleteSync();
+      }
     }
   }
 
   void _cropToSquare() {
-    var jpegtran = JpegTransformer(_imageBytes);
+    var jpegtran = JpegTransformer(_imageBytes!);
     try {
       var info = jpegtran.getInfo();
       print("transform input: ${info.width}x${info.height}, "
           "subsamp: ${info.subsampString}, "
-          "${_imageBytes.lengthInBytes} bytes");
+          "${_imageBytes!.lengthInBytes} bytes");
 
-      JpegCrop crop;
+      JpegCrop? crop;
       if (info.width > info.height) {
         crop = JpegCrop(
             x: (info.width - info.height) ~/ 2,
@@ -131,7 +134,7 @@ class _CropSquareState extends State<CropSquarePage> {
     }
   }
 
-  void _showError(Exception err, BuildContext context) {
+  void _showError(Object err, BuildContext context) {
     var scaffold = ScaffoldMessenger.of(context);
     scaffold.removeCurrentSnackBar();
     scaffold.showSnackBar(SnackBar(

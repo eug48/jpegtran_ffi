@@ -1,6 +1,7 @@
 # 0.0.8
 
-* Added `JpegSegment` to support loading and preserving EXIF data
+* Added `JpegSegment` class to support preserving EXIF data
+* Null safety
 
 ## 0.0.7
 
