@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -36,8 +34,10 @@ class _OperationsState extends State<OperationsPage> {
       return CircularProgressIndicator();
     }
 
+    print("-----------");
     var segments = JpegSegment.readHeaders(_imageBytes);
-    segments.forEach((segment) => print("have segment $segment"));
+    segments.forEach((segment) => print("have $segment"));
+    print("-----------");
 
     return Scaffold(
       appBar: AppBar(
@@ -191,26 +191,16 @@ class _OperationsState extends State<OperationsPage> {
     }
   }
 
-  void _recompress({int quality, bool keepEXIF = true}) {
+  void _recompress({int quality, bool preserveEXIF = true}) {
     var jpegtran = JpegTransformer(_imageBytes);
     try {
       var info = jpegtran.getInfo();
       print("recompress input: ${info.width}x${info.height}, "
           "${_imageBytes.lengthInBytes} bytes");
-      var newImage = jpegtran.recompress(quality: quality);
-
-      if (keepEXIF) {
-        // can also use an IOSink (File("abc").openWrite())
-        var sink = BytesIOSink();
-
-        JpegSegment.rewriteWithAlternateAppSegments(
-            jpegToWrite: newImage,
-            jpegWithAppSegmentsToUse: _imageBytes,
-            writer: sink);
-
-        newImage = sink.bytes.takeBytes();
-        sink.close();
-      }
+      var newImage = jpegtran.recompress(
+        quality: quality,
+        preserveEXIF: preserveEXIF,
+      );
 
       setState(() {
         _imageBytes = newImage;
@@ -219,21 +209,4 @@ class _OperationsState extends State<OperationsPage> {
       jpegtran.dispose();
     }
   }
-}
-
-class BytesIOSink implements EventSink<List<int>> {
-  final BytesBuilder bytes = BytesBuilder();
-
-  @override
-  void add(List<int> data) {
-    bytes.add(data);
-  }
-
-  @override
-  void addError(Object error, [StackTrace stackTrace]) {
-    throw error;
-  }
-
-  @override
-  void close() {}
 }

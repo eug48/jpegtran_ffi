@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'dart:ffi';
+import 'dart:typed_data';
+
 import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:typed_data';
-import 'package:jpegtran_ffi/src/bindings.dart';
+
+import 'src/bindings.dart';
+import 'JpegSegment.dart';
 
 /// Information from a JPEG's header
 class JpegInfo {
@@ -243,19 +247,24 @@ class JpegTransverse implements JpegTransformation {
   }
 }
 
-/// Mostly lossless transformations for JPEG images
+/// Transformations for JPEG images
+///
+/// * Transforms based on `jpegtran` code (lossless if properly aligned)
+/// * Recompression
 ///
 /// Implemented via FFI to libjpeg-turbo's jpegtran API
-/// Users need to call dispose to free memory
+///
+/// Users need to call `dispose` to free memory
 class JpegTransformer {
   static final JpegTranBindings _bindings = JpegTranBindings();
   Pointer<TJHandle> _handleCompress;
   Pointer<TJHandle> _handleDecompress;
   Pointer<TJHandle> _handleTransform;
   Pointer<Uint8> _jpegBuf;
+  Uint8List jpegBytes;
   int _jpegSize;
 
-  JpegTransformer(Uint8List jpegBytes) {
+  JpegTransformer(this.jpegBytes) {
     _handleCompress = _bindings.tjInitCompress();
     _handleDecompress = _bindings.tjInitDecompress();
     _handleTransform = _bindings.tjInitTransform();
@@ -284,7 +293,7 @@ class JpegTransformer {
     return buf.toDartString();
   }
 
-  /// Basic information from the JPEG header
+  /// Get basic information from the JPEG header
   JpegInfo getInfo() {
     // TODO: put into a single allocation
     final pWidth = calloc<Uint32>();
@@ -322,6 +331,7 @@ class JpegTransformer {
     return info;
   }
 
+  /// Perform a transformation
   Uint8List transform(JpegTransformation transformation) {
     var tf = transformation._getTransform(this);
 
@@ -359,7 +369,42 @@ class JpegTransformer {
     return outBytes;
   }
 
-  Uint8List recompress({quality = 80}) {
+  Uint8List recompress({
+    int quality = 80,
+    bool preserveEXIF = true,
+  }) {
+    var newJpeg = _recompress(quality: quality);
+    if (preserveEXIF) {
+      var sink = _BytesIOSink();
+
+      JpegSegment.rewriteWithAlternateAppSegments(
+          jpegToWrite: newJpeg,
+          jpegWithAppSegmentsToUse: jpegBytes,
+          writer: sink);
+
+      newJpeg = sink.bytes.takeBytes();
+      sink.close();
+    }
+    return newJpeg;
+  }
+
+  void recompressTo(
+    EventSink<List<int>> writer, {
+    int quality = 80,
+    bool preserveEXIF = true,
+  }) {
+    var newJpeg = _recompress(quality: quality);
+    if (preserveEXIF) {
+      JpegSegment.rewriteWithAlternateAppSegments(
+          jpegToWrite: newJpeg,
+          jpegWithAppSegmentsToUse: jpegBytes,
+          writer: writer);
+    } else {
+      writer.add(newJpeg);
+    }
+  }
+
+  Uint8List _recompress({int quality}) {
     JpegInfo info = getInfo();
     int pad = 4;
     int flags = 0;
@@ -420,4 +465,21 @@ class JpegTransformer {
 
     return outBytes;
   }
+}
+
+class _BytesIOSink implements EventSink<List<int>> {
+  final BytesBuilder bytes = BytesBuilder();
+
+  @override
+  void add(List<int> data) {
+    bytes.add(data);
+  }
+
+  @override
+  void addError(Object error, [StackTrace stackTrace]) {
+    throw error;
+  }
+
+  @override
+  void close() {}
 }

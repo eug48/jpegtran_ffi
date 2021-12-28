@@ -1,6 +1,6 @@
 # jpegtran_ffi
 
-Lossless transformations of JPEG images, similar to those than can be made using `jpegtran` tool, e.g. cropping and rotations. Since JPEG data doesn't need to be decoded or encoded it should hopefully be fast as well.
+Mostly lossless transformations of JPEG images, similar to those than can be made using `jpegtran` tool, e.g. cropping and rotations. Since JPEG data doesn't need to be decoded or encoded it should hopefully be fast as well.
 
 A lossy recompress method to reduce quality & size is also included. EXIF data can be copied from the original image.
 
