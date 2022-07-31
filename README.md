@@ -2,7 +2,7 @@
 
 Mostly lossless transformations of JPEG images, similar to those than can be made using `jpegtran` tool, e.g. cropping and rotations. Since JPEG data doesn't need to be decoded or encoded it should hopefully be fast as well.
 
-A lossy recompress method to reduce quality & size is also included. EXIF data can be copied from the original image.
+A lossy recompress method to reduce quality & optionally resize has also been added. Resizing is done by libjpeg-turbo during decompression so it should be fast, but a limited set of scaling factors are supported (including 1/2, 1/4, 1/8). EXIF data can be copied from the original image.
 
 This package uses [libjpeg-turbo](https://libjpeg-turbo.org/) via Dart's FFI. Unlike platform plugins it should be usable from within isolates.
 
@@ -46,6 +46,7 @@ Uint8List recompress(Uint8List jpegBytes) {
   var jpegtran = JpegTransformer(jpegBytes);
   try {
     return jpegtran.recompress(
+      scale: 0.25,
       quality: 70,
       preserveEXIF: true,
     );
@@ -58,4 +59,3 @@ Uint8List recompress(Uint8List jpegBytes) {
 ## TODO
 
 * Remove unneeded parts of libjpeg-turbo
-* Lossy resizing

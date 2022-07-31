@@ -122,6 +122,10 @@ class _OperationsState extends State<OperationsPage> {
             child: Text("Recompress (q=75)"),
             onPressed: () => _recompress(quality: 75),
           ),
+          TextButton(
+            child: Text("Recompress (q=75, scale=0.5)"),
+            onPressed: () => _recompress(quality: 75, scale: 0.5),
+          ),
         ],
       ),
     ];
@@ -191,13 +195,18 @@ class _OperationsState extends State<OperationsPage> {
     }
   }
 
-  void _recompress({required int quality, bool preserveEXIF = true}) {
+  void _recompress({
+    required int quality,
+    double scale = 1,
+    bool preserveEXIF = true,
+  }) {
     var jpegtran = JpegTransformer(_imageBytes!);
     try {
       var info = jpegtran.getInfo();
       print("recompress input: ${info.width}x${info.height}, "
           "${_imageBytes!.lengthInBytes} bytes");
       var newImage = jpegtran.recompress(
+        scale: scale,
         quality: quality,
         preserveEXIF: preserveEXIF,
       );

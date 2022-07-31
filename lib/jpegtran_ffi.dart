@@ -367,11 +367,14 @@ class JpegTransformer {
     return outBytes;
   }
 
+  /// Lossy recompression and optional downscaling
+  /// Scale should be 1, 0.5, 0.25 or 0.125
   Uint8List recompress({
     int quality = 80,
+    double scale = 1,
     bool preserveEXIF = true,
   }) {
-    var newJpeg = _recompress(quality: quality);
+    var newJpeg = _recompress(quality: quality, scale: scale);
     if (preserveEXIF) {
       var sink = _BytesIOSink();
 
@@ -386,12 +389,15 @@ class JpegTransformer {
     return newJpeg;
   }
 
+  /// Lossy recompression and optional downscaling
+  /// Scale should be 1, 0.5, 0.25 or 0.125
   void recompressTo(
     EventSink<List<int>> writer, {
     int quality = 80,
+    double scale = 1,
     bool preserveEXIF = true,
   }) {
-    var newJpeg = _recompress(quality: quality);
+    var newJpeg = _recompress(quality: quality, scale: scale);
     if (preserveEXIF) {
       JpegSegment.rewriteWithAlternateAppSegments(
           jpegToWrite: newJpeg,
@@ -402,15 +408,21 @@ class JpegTransformer {
     }
   }
 
-  Uint8List _recompress({required int quality}) {
+  Uint8List _recompress({
+    required int quality,
+    required double scale,
+  }) {
     JpegInfo info = getInfo();
     int pad = 4;
     int flags = 0;
 
+    int height = (info.height * scale).ceil();
+    int width = (info.width * scale).ceil();
+
     int yuvBufSize = _bindings.tjBufSizeYUV2(
-      info.width,
+      width,
       pad,
-      info.height,
+      height,
       info.subsamp,
     );
     final yuvBuf = calloc<Uint8>(yuvBufSize);
@@ -420,9 +432,9 @@ class JpegTransformer {
       _jpegBuf,
       _jpegSize,
       yuvBuf,
-      info.width,
+      width,
       pad,
-      info.height,
+      height,
       flags,
     );
     if (res != 0) {
@@ -436,9 +448,9 @@ class JpegTransformer {
     res = _bindings.tjCompressFromYUV(
       _handleCompress,
       yuvBuf,
-      info.width,
+      width,
       pad,
-      info.height,
+      height,
       info.subsamp,
       pDstBuf,
       pJpegSize,

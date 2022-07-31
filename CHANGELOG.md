@@ -1,3 +1,7 @@
+# 0.0.9
+
+* Added `scale` option to `recompress` for lossy resizing (e.g. to create thumbnails)
+
 # 0.0.8
 
 * Added `JpegSegment` class to support preserving EXIF data

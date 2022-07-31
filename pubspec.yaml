@@ -1,10 +1,10 @@
 name: jpegtran_ffi
 description: Mostly lossless transformations of JPEG images, implemented using libjpeg-turbo via Dart's FFI.
-version: 0.0.8
+version: 0.0.9
 homepage: https://www.github.com/eug48/jpegtran_ffi
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
   flutter: ">=1.12.0"
 
 dependencies:
