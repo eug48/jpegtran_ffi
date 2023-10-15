@@ -59,3 +59,8 @@ Uint8List recompress(Uint8List jpegBytes) {
 ## TODO
 
 * Remove unneeded parts of libjpeg-turbo
+
+# License
+
+jpegtran_ffi code is licensed under the 3-Clause BSD License.
+Please do note that it is a wrapper around libjpeg-turbo - so please see [its license](https://github.com/libjpeg-turbo/libjpeg-turbo/blob/ab6c4a5db10901fa2ae9e8594768175e02b6e016/LICENSE.md)
