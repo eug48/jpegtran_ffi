@@ -1,3 +1,8 @@
+# 0.1.0
+
+* Fixes for newer dart
+* ffi package updated to ffi 2.1.0
+
 # 0.0.9
 
 * Added `scale` option to `recompress` for lossy resizing (e.g. to create thumbnails)

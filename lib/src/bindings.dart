@@ -18,20 +18,20 @@ class TJTransform extends Struct {
   external int y;
 
   @Int32()
-  external int? w;
+  external int w;
 
   @Int32()
-  external int? h;
+  external int h;
 
   @Int32()
-  external int? op;
+  external int op;
 
   @Int32()
   external int options;
 
-  external Pointer<Void>? data;
+  external Pointer<Void> data;
 
-  external Pointer<Void>? pCustomFilter;
+  external Pointer<Void> pCustomFilter;
 
   void init() {
     x = 0;
